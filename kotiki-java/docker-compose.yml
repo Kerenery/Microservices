@@ -1,0 +1,67 @@
+version: '3'
+services:
+
+  rabbitmq:
+    container_name: shitmq
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  apiservice:
+    build: ./apiservice
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8081"
+    environment:
+      - "SPRING_RABBITMQ_HOST=rabbitmq"
+      - "LOGSTASH_HOST=host.docker.internal"
+    tty:
+      true
+    restart:
+      unless-stopped
+
+  kotikiservice:
+    build: ./kotikiservice
+    depends_on:
+      - rabbitmq
+    ports:
+      - "8090"
+    environment:
+      - "SPRING_RABBITMQ_HOST=rabbitmq"
+      - "LOGSTASH_HOST=host.docker.internal"
+    tty:
+      true
+    restart:
+      unless-stopped
+
+  ownerserivce:
+     build: ./ownerservice
+     depends_on:
+       - rabbitmq
+     ports:
+       - "8091"
+     environment:
+       - "SPRING_RABBITMQ_HOST=rabbitmq"
+       - "LOGSTASH_HOST=host.docker.internal"
+     tty:
+       true
+     restart:
+       unless-stopped
+
+  postgresql:
+    container_name: postgres
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "1"
+      PGDATA: "/data/postgres"
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "15432:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres:

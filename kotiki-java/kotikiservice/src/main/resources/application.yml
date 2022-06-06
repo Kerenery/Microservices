@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ${springboot.app.name:kotikiservice}
+  rabbitmq:
+    host: localhost
+    password: guest
+    port: 5672
+    username: guest
+    exchange: user.exchange
+    routingkey: user.routingkey
+server:
+  port: 8082
